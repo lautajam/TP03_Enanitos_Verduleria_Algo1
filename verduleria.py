@@ -2,18 +2,12 @@ import sys
 import csv
 import os
 
-"""
-UN METODO QUE DEVUELVA EL COMANDO ESCRITO NO VALIDO:
-"Comando 'elimnar C' no valido, reingrese"
-Tengo que tomar la lista de argumentos y ver hacer un string con los argumentos que no son validos
-"""
-
 # Codigos de verduras
 TOMATE = "t"
 LECHUGA = "l"
 ZANAHORIA = "z"
 BROCOLI = "b"
-verduras = (TOMATE, LECHUGA, ZANAHORIA, BROCOLI )
+verduras = (TOMATE, LECHUGA, ZANAHORIA, BROCOLI)
 
 # Posiciones de los lista_argumentos
 POSICION_COMANDO = 1
@@ -26,7 +20,8 @@ LISTAR_PEDIDOS = "listar"
 AGREGAR_PEDIDOS = "agregar"
 ELIMINAR_PEDIDOS = "eliminar"
 MODIFICAR_PEDIDOS = "modificar"
-comandos_validos = (LISTAR_PEDIDOS, AGREGAR_PEDIDOS, ELIMINAR_PEDIDOS, MODIFICAR_PEDIDOS)
+AYUDA = "ayuda"
+comandos_validos = (LISTAR_PEDIDOS, AGREGAR_PEDIDOS, ELIMINAR_PEDIDOS, MODIFICAR_PEDIDOS, AYUDA)
 
 # Agregar pedido
 CANTIDAD_ARGUMENTOS_AGREGAR = 5
@@ -48,7 +43,6 @@ CREAR_ARCHIVO = "x"
 lista_argumentos = sys.argv
 
 """ --- LISTADO DE PEDIDOS --- """
-
 # Pre: verdura es el código de la verdura
 # Post: devuelve por consola el nombre de la verdura
 def escribir_verdura(verdura):
@@ -113,11 +107,9 @@ def listar_pedidos():
         listar_pedido_especifico(lista_argumentos[2])
     else:
         print("Comando no válido")
-
 """ --- LISTADO DE PEDIDOS --- """
 
 """ --- AGREGAR PEDIDO --- """
-
 # Pre: verdura es el código de la verdura
 # Post: devuelve si la verdura es válida (si está en la lista de verduras)
 def verificar_verdura(verdura):
@@ -172,11 +164,9 @@ def agregar_pedido():
         print("Pedido agregado")
     else:
         print("Comando no válido, reingrese")
-
 """ --- AGREGAR PEDIDO --- """
 
 """ --- ELIMINAR PEDIDO --- """
-
 # Pre: archivo_a_leer es el archivo csv
 # Post: Devuelve una lista con los elementos en el archivo pasado
 def leer_archivo(archivo_a_leer):
@@ -241,11 +231,9 @@ def eliminar():
             print(f"Error: El pedido {pedido_a_eliminar} no existe.")
     else:
         print("Comando no válido")
-
 """ --- ELIMINAR PEDIDO --- """
 
 """ --- MODIFICAR PEDIDO --- """
-
 # Pre: pedidos es una lista de listas, id_pedido_a_modificar es el id del pedido que queremos modificar,
 #      verdura_pedido_a_modificar es la verdura del pedido que queremos modificar y
 #      cantidad_pedido_a_modificar es la cantidad del pedido que queremos modificar
@@ -283,8 +271,74 @@ def modificar():
         reescribir_archivo(pedidos_modificados, ARCHIVO_PEDIDOS)
     else:
         print("Comando no válido")
-
 """ --- MODIFICAR PEDIDO --- """
+
+""" --- AYUDA --- """
+# Pre: -
+# Post: Muestra por consola los comandos válidos
+def ayuda_basica():
+    print("Comandos válidos:")
+    print("     * listar, para listar todos los pedidos o un pedido específico")
+    print("     * agregar, para agregar un pedido")
+    print("     * eliminar, para eliminar un pedido")
+    print("     * modificar, para modificar un pedido")
+    print("     * ayuda, para mostrar los comandos válidos")
+    print("Si quieres mas información sobre un comando, escribe 'ayuda' seguido del comando")
+
+# Pre: -
+# Post: Muestra por consola los comandos válidos para listar
+def ayuda_listar():
+    print("Comando 'listar' válido:")
+    print("     * listar, para listar todos los pedidos o un pedido específico")
+    print("     * listar <id_pedido>, para listar un pedido específico")
+
+# Pre: -
+# Post: Muestra por consola los comandos válidos para agregar
+def ayuda_agregar():
+    print("Comando 'agregar' válido:")
+    print("     * agregar <id_pedido> <verdura> <cantidad> <cliente>, para agregar un pedido")
+
+# Pre: -
+# Post: Muestra por consola los comandos válidos para eliminar
+def ayuda_eliminar():
+    print("Comando 'eliminar' válido:")
+    print("     * eliminar <id_pedido>, para eliminar un pedido")
+
+# Pre: -
+# Post: Muestra por consola los comandos válidos para modificar
+def ayuda_modificar():
+    print("Comando 'modificar' válido:")
+    print("     * modificar <id_pedido> <verdura> <cantidad>, para modificar un pedido")
+
+# Pre: -
+# Post: Muestra por consola los comandos válidos para ayuda
+def ayuda_ayuda():
+    print("Comando 'ayuda' válido_")
+    print("     * ayuda, para mostrar los comandos válidos")
+    print("     * ayuda <comando>, para mostrar información sobre un comando")
+
+# Pre: -
+# Post: Muestra por consola los comandos válidos
+def ayuda():
+    if len(lista_argumentos) == 2:
+        ayuda_basica()
+    elif len(lista_argumentos) == 3:
+        comando = lista_argumentos[2]
+        if comando == LISTAR_PEDIDOS:
+            ayuda_listar()
+        elif comando == AGREGAR_PEDIDOS:
+            ayuda_agregar()
+        elif comando == ELIMINAR_PEDIDOS:
+            ayuda_eliminar()
+        elif lista_argumentos[2] == MODIFICAR_PEDIDOS:
+            ayuda_modificar()
+        elif comando == AYUDA:
+            ayuda_ayuda()
+        else:
+            print("Comando de ayuda no válido")
+    else:
+        print("Comando de ayuda no válido")
+""" --- AYUDA --- """
 
 """
 Pre: -
@@ -292,7 +346,8 @@ Post: Dependiendo del comando ingresado por consola, se ejecuta la función corr
         listar, para listar todos los pedidos o un pedido específico
         agregar, para agregar un pedido 
         eliminar, para eliminar un pedido
-        modificar, para modificar un pedido+
+        modificar, para modificar un pedido
+        ayuda, para mostrar los comandos válidos
         En caso de que el comando no sea válido, muestra un mensaje de error
 """
 def manejar_archivo():
@@ -304,6 +359,8 @@ def manejar_archivo():
         eliminar()
     elif lista_argumentos[POSICION_COMANDO] == MODIFICAR_PEDIDOS:
         modificar()
+    elif lista_argumentos[POSICION_COMANDO] == AYUDA:
+        ayuda()
     else:
         print("Comando no válido")
 
@@ -314,9 +371,23 @@ def chequear_archivo(archivo):
         with open(archivo, CREAR_ARCHIVO):
             pass
 
-if __name__ == "__main__":
-    
+# Pre: -
+# Post: Chequea si el comando ingresado por consola es válido, si no es válido, muestra un mensaje de error
+def chequear_comando():
+    if lista_argumentos[POSICION_COMANDO] not in comandos_validos:
+        print("Comando no válido")
+        return False
+    return True
+
+# Pre: -
+# Post: Chequea si los archivos "verduleria_enanitos.csv" y "clientes.csv" existen, si no existen, los crea
+def chequear_archivos():
     chequear_archivo(ARCHIVO_PEDIDOS)
     chequear_archivo(ARCHIVO_CLIENTES)
 
-    manejar_archivo()
+if __name__ == "__main__":
+    
+    chequear_archivos()
+
+    if chequear_comando():
+        manejar_archivo()
