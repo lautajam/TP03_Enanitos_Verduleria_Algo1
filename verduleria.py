@@ -1,6 +1,4 @@
-import sys
-import csv
-import os
+import sys, csv, os
 
 # Codigos de verduras
 TOMATE = "t"
@@ -35,7 +33,7 @@ ARCHIVO_CLIENTES = "clientes.csv"
 
 # Modos de apertura de archivos
 ESCRIBIR_ARCHIVO = "a"
-REENVIO_ARCHIVO = "w"
+REESCRIBIR_ARCHIVO = "w"
 LEER_ARCHIVO = "r"
 CREAR_ARCHIVO = "x"
 
@@ -55,22 +53,34 @@ def escribir_verdura(verdura):
     elif verdura == BROCOLI:
         print("Producto: Brócoli")
 
+# Pre: pedido es un pedido en formato id;verdura;cantidad
+# Post: muestra por consola el pedido
+def escribir_pedido(pedido):
+    print("-----------")
+    print("Pedido número:", pedido[ID_PEDIDO])
+    escribir_verdura(pedido[VERDURA].lower())
+    print("Cantidad:", pedido[CANTIDAD])
+    print("-----------")
+
 # Pre: el numero de pedido puede o no existir en el archivo "verduleria_enanitos.csv"
 # Post: si el pedido existe, lo lista, si no existe, muestra un mensaje de error
 def listar_pedido_especifico(numero_pedido):
         
         with open(ARCHIVO_PEDIDOS, LEER_ARCHIVO) as archivo:
 
+            pedidos_especificos = []
+
+            print("Listar pedido específico:")
             for fila in csv.reader(archivo):
                 pedidos = fila[0].split(";")
     
                 if pedidos[0] == numero_pedido:
-                    print("Listar pedido específico:")
-                    print("Pedido número:", pedidos[ID_PEDIDO])
-                    escribir_verdura(pedidos[VERDURA].lower())
-                    print("Cantidad:", pedidos[CANTIDAD])
-                    print("-----------")
-                    return
+                    pedidos_especificos.append(pedidos)
+            
+            if len(pedidos_especificos) > 0:
+                for pedido in pedidos_especificos:
+                    escribir_pedido(pedido)
+                return
                 
         print("El pedido no existe")
 
@@ -89,14 +99,13 @@ def listar_todos_los_pedidos():
 
         print("Listar todos los pedidos:")
 
-        for fila in csv.reader(archivo):
+        lectura_archivo = csv.reader(archivo)
 
-            pedidos = fila[0].split(";")
+        for fila in lectura_archivo:
 
-            print("Pedido número:", pedidos[ID_PEDIDO])
-            escribir_verdura(pedidos[VERDURA].lower())
-            print("Cantidad:", pedidos[CANTIDAD])
-            print("-----------")
+            pedido = fila[0].split(";")
+
+            escribir_pedido(pedido)
 
 # Pre: -
 # Post: Lista todos los pedidos del archivo "verduleria_enanitos.csv", si 
@@ -188,7 +197,7 @@ def eliminar_indicado(lista, elemento_a_eliminar):
 # Pre: Lista es una lista de listas y archivo_a_reescribir es el archivo csv que queremos usar
 # Post: Reescribe el archivo "archivo_a_reescribir" con los elementos de la lista
 def reescribir_archivo(lista, archivo_a_reescribir):
-    with open(archivo_a_reescribir, REENVIO_ARCHIVO, newline='') as archivo:
+    with open(archivo_a_reescribir, REESCRIBIR_ARCHIVO, newline='') as archivo:
         escritor_csv = csv.writer(archivo, delimiter=';')
         escritor_csv.writerows(lista)
 
@@ -234,24 +243,53 @@ def eliminar():
 """ --- ELIMINAR PEDIDO --- """
 
 """ --- MODIFICAR PEDIDO --- """
+# Pre: pedido es un pedido en formato id;verdura;cantidad, 
+#       id_pedido_a_modificar es el id del pedido que queremos modificar,
+#       verdura_pedido_a_modificar es la verdura del pedido que queremos modificar y
+#       cantidad_pedido_a_modificar es la cantidad del pedido que queremos modificar
+# Post: Devuelve si al pedido hay que modificarle solo la cantidad, ya que el id y la verdura son iguales
+def modificar_pedido_cantidad(pedido, id_pedido_a_modificar, verdura_pedido_a_modificar):
+    return pedido[ID_PEDIDO] == id_pedido_a_modificar and pedido[VERDURA] == verdura_pedido_a_modificar
+
+# Pre: pedido es un pedido en formato id;verdura;cantidad,
+#       id_pedido_a_modificar es el id del pedido que queremos modificar y
+#       verdura_pedido_a_modificar es la verdura del pedido que queremos modificar
+# Post: Devuelve si al pedido hay que modificarle la verdura y la cantidad, ya que el id es igual
+def modificar_pedido_verdura_cantidad(pedidos, id_pedido_a_modificar, verdura_pedido_a_modificar):
+    return verdura_valida(verdura_pedido_a_modificar) and pedido_existe(pedidos, id_pedido_a_modificar)
+
 # Pre: pedidos es una lista de listas, id_pedido_a_modificar es el id del pedido que queremos modificar,
 #      verdura_pedido_a_modificar es la verdura del pedido que queremos modificar y
 #      cantidad_pedido_a_modificar es la cantidad del pedido que queremos modificar
 # Post: Devuelve la lista de pedidos modificada
 def modificar_pedido(pedidos, id_pedido_a_modificar, verdura_pedido_a_modificar, cantidad_pedido_a_modificar):
+
     for pedido in pedidos:
-        if pedido[ID_PEDIDO] == id_pedido_a_modificar and pedido[VERDURA] == verdura_pedido_a_modificar:
+        if modificar_pedido_cantidad(pedido, id_pedido_a_modificar, verdura_pedido_a_modificar):
             pedido[CANTIDAD] = cantidad_pedido_a_modificar
-            print("Pedido modificado")
+            print(f"Pedido {id_pedido_a_modificar} modificado, cantidad actualizada")
             return pedidos
 
-    if verdura_valida(verdura_pedido_a_modificar):
+    if modificar_pedido_verdura_cantidad(pedidos, id_pedido_a_modificar, verdura_pedido_a_modificar):
         pedidos.append([id_pedido_a_modificar, verdura_pedido_a_modificar, cantidad_pedido_a_modificar])
-        print("Pedido agregado")
-    else:
-        print("El pedido no existe y la verdura no es válida")
+        print(f"Pedido {id_pedido_a_modificar} modificado, verdura y cantidad agregada")
+    elif not pedido_existe(pedidos, id_pedido_a_modificar):
+        print("El pedido no existe")
+    elif not verdura_valida(verdura_pedido_a_modificar):
+        print("La verdura no es válida")
 
     return pedidos
+
+# Pre: id_pedido_a_modificar es el id del pedido que queremos modificar,
+#      verdura_pedido_a_modificar es la verdura del pedido que queremos modificar y
+#      cantidad_pedido_a_modificar es la cantidad del pedido que queremos modificar
+# Post: Devuelve si los argumentos son válidos para modificar un pedido
+def validar_modificacion(id_pedido_a_modificar, verdura_pedido_a_modificar, cantidad_pedido_a_modificar):
+    return (
+        id_pedido_a_modificar.isdigit() and
+        cantidad_pedido_a_modificar.isdigit() and
+        verdura_pedido_a_modificar.isalpha()
+    )
 
 # Pre: -
 # Post: Modifica un pedido del archivo "verduleria_enanitos.csv"
@@ -260,15 +298,21 @@ def modificar():
         pedidos = leer_archivo(ARCHIVO_PEDIDOS)
 
         id_pedido_a_modificar = lista_argumentos[2]
-        verdura_pedido_a_modificar = lista_argumentos[3]
+        verdura_pedido_a_modificar = lista_argumentos[3].upper()
         cantidad_pedido_a_modificar = lista_argumentos[4]
 
-        pedidos_modificados = modificar_pedido(pedidos, 
-                                               id_pedido_a_modificar, 
-                                               verdura_pedido_a_modificar, 
-                                               cantidad_pedido_a_modificar)
-        
-        reescribir_archivo(pedidos_modificados, ARCHIVO_PEDIDOS)
+        if validar_modificacion(id_pedido_a_modificar, 
+                                verdura_pedido_a_modificar, 
+                                cantidad_pedido_a_modificar):
+            
+            pedidos_modificados = modificar_pedido(pedidos, 
+                                                id_pedido_a_modificar, 
+                                                verdura_pedido_a_modificar, 
+                                                cantidad_pedido_a_modificar)
+            
+            reescribir_archivo(pedidos_modificados, ARCHIVO_PEDIDOS)
+        else:
+            print("Ingreso no valido, debe ingresar <id_pedido> <verdura> <cantidad> (numero, letra, numero)")
     else:
         print("Comando no válido")
 """ --- MODIFICAR PEDIDO --- """
@@ -296,7 +340,7 @@ def ayuda_listar():
 # Post: Muestra por consola los comandos válidos para agregar
 def ayuda_agregar():
     print("Comando 'agregar' válido:")
-    print("     * agregar <id_pedido> <verdura> <cantidad> <cliente>, para agregar un pedido")
+    print("     * agregar <cantidad> <verdura> <cliente>, para agregar un pedido")
 
 # Pre: -
 # Post: Muestra por consola los comandos válidos para eliminar
