@@ -13,6 +13,7 @@ TOMATE = "t"
 LECHUGA = "l"
 ZANAHORIA = "z"
 BROCOLI = "b"
+verduras = (TOMATE, LECHUGA, ZANAHORIA, BROCOLI )
 
 # Posiciones de los lista_argumentos
 POSICION_COMANDO = 1
@@ -25,6 +26,7 @@ LISTAR_PEDIDOS = "listar"
 AGREGAR_PEDIDOS = "agregar"
 ELIMINAR_PEDIDOS = "eliminar"
 MODIFICAR_PEDIDOS = "modificar"
+comandos_validos = (LISTAR_PEDIDOS, AGREGAR_PEDIDOS, ELIMINAR_PEDIDOS, MODIFICAR_PEDIDOS)
 
 # Agregar pedido
 CANTIDAD_ARGUMENTOS_AGREGAR = 5
@@ -77,7 +79,6 @@ def listar_pedido_especifico(numero_pedido):
                     return
                 
         print("El pedido no existe")
-
 
 # Pre: -
 # Post: Lista todos los pedidos del archivo "verduleria_enanitos.csv", en caso de que no haya pedidos, 
@@ -228,14 +229,14 @@ def eliminar_cliente(clientes, pedido_a_eliminar):
 def eliminar():
     pedido_a_eliminar = lista_argumentos[2]
     if eliminacion_valida(pedido_a_eliminar):
-        
+
         pedidos = leer_archivo(ARCHIVO_PEDIDOS)
         clientes = leer_archivo(ARCHIVO_CLIENTES)
 
         if pedido_existe(pedidos, pedido_a_eliminar):
             eliminar_pedido(pedidos, pedido_a_eliminar)
             eliminar_cliente(clientes, pedido_a_eliminar)
-            print(f"Pedido {lista_argumentos[2]} eliminado")
+            print(f"Pedido {pedido_a_eliminar} eliminado")
         else:
             print(f"Error: El pedido {pedido_a_eliminar} no existe.")
     else:
@@ -245,25 +246,45 @@ def eliminar():
 
 """ --- MODIFICAR PEDIDO --- """
 
-def modificar_pedido():
-    pedidos = leer_archivo()
-
-    pedidos_a_modificar = []
-
+# Pre: pedidos es una lista de listas, id_pedido_a_modificar es el id del pedido que queremos modificar,
+#      verdura_pedido_a_modificar es la verdura del pedido que queremos modificar y
+#      cantidad_pedido_a_modificar es la cantidad del pedido que queremos modificar
+# Post: Devuelve la lista de pedidos modificada
+def modificar_pedido(pedidos, id_pedido_a_modificar, verdura_pedido_a_modificar, cantidad_pedido_a_modificar):
     for pedido in pedidos:
-        if pedido[ID_PEDIDO] == lista_argumentos[2]:
-            pedidos_a_modificar.append(pedido)
-        else:
-            print("El pedido no existe")
-            return
+        if pedido[ID_PEDIDO] == id_pedido_a_modificar and pedido[VERDURA] == verdura_pedido_a_modificar:
+            pedido[CANTIDAD] = cantidad_pedido_a_modificar
+            print("Pedido modificado")
+            return pedidos
 
-    pass
+    if verdura_valida(verdura_pedido_a_modificar):
+        pedidos.append([id_pedido_a_modificar, verdura_pedido_a_modificar, cantidad_pedido_a_modificar])
+        print("Pedido agregado")
+    else:
+        print("El pedido no existe y la verdura no es válida")
 
+    return pedidos
 
+# Pre: -
+# Post: Modifica un pedido del archivo "verduleria_enanitos.csv"
+def modificar():
+    if len(lista_argumentos) == 5:
+        pedidos = leer_archivo(ARCHIVO_PEDIDOS)
 
+        id_pedido_a_modificar = lista_argumentos[2]
+        verdura_pedido_a_modificar = lista_argumentos[3]
+        cantidad_pedido_a_modificar = lista_argumentos[4]
+
+        pedidos_modificados = modificar_pedido(pedidos, 
+                                               id_pedido_a_modificar, 
+                                               verdura_pedido_a_modificar, 
+                                               cantidad_pedido_a_modificar)
+        
+        reescribir_archivo(pedidos_modificados, ARCHIVO_PEDIDOS)
+    else:
+        print("Comando no válido")
 
 """ --- MODIFICAR PEDIDO --- """
-
 
 """
 Pre: -
@@ -282,7 +303,7 @@ def manejar_archivo():
     elif lista_argumentos[POSICION_COMANDO] == ELIMINAR_PEDIDOS:
         eliminar()
     elif lista_argumentos[POSICION_COMANDO] == MODIFICAR_PEDIDOS:
-        modificar_pedido()
+        modificar()
     else:
         print("Comando no válido")
 
