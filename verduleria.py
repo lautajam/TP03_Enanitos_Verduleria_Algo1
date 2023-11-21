@@ -45,7 +45,8 @@ CREAR_ARCHIVO = "x"
 # Lista de argumentos
 lista_argumentos = sys.argv
 
-# --- LISTADO DE PEDIDOS ---
+""" --- LISTADO DE PEDIDOS --- """
+
 # Pre: verdura es el código de la verdura
 # Post: devuelve por consola el nombre de la verdura
 def escribir_verdura(verdura):
@@ -77,11 +78,10 @@ def listar_pedido_especifico(numero_pedido):
                 
         print("El pedido no existe")
 
-"""
-Pre: -
-Post: Lista todos los pedidos del archivo "verduleria_enanitos.csv", en caso de que no haya pedidos, 
-        muestra un mensaje de error
-"""
+
+# Pre: -
+# Post: Lista todos los pedidos del archivo "verduleria_enanitos.csv", en caso de que no haya pedidos, 
+#       muestra un mensaje de error
 def listar_todos_los_pedidos():
     with open(ARCHIVO_PEDIDOS, LEER_ARCHIVO) as archivo:
         
@@ -113,9 +113,9 @@ def listar_pedidos():
     else:
         print("Comando no válido")
 
-# --- LISTADO DE PEDIDOS ---
+""" --- LISTADO DE PEDIDOS --- """
 
-# --- AGREGAR PEDIDO ---
+""" --- AGREGAR PEDIDO --- """
 
 # Pre: verdura es el código de la verdura
 # Post: devuelve si la verdura es válida (si está en la lista de verduras)
@@ -172,55 +172,98 @@ def agregar_pedido():
     else:
         print("Comando no válido, reingrese")
 
-# --- AGREGAR PEDIDO ---
+""" --- AGREGAR PEDIDO --- """
 
-# --- ELIMINAR PEDIDO ---
+""" --- ELIMINAR PEDIDO --- """
 
-# Pre: -
-# Post: Devuelve una lista con los pedidos del archivo "verduleria_enanitos.csv
-def leer_archivo():
-    with open(ARCHIVO_PEDIDOS, LEER_ARCHIVO, newline='') as archivo:
+# Pre: archivo_a_leer es el archivo csv
+# Post: Devuelve una lista con los elementos en el archivo pasado
+def leer_archivo(archivo_a_leer):
+    with open(archivo_a_leer, LEER_ARCHIVO, newline='') as archivo:
         return list(csv.reader(archivo, delimiter=';'))
 
-"""
-Pre: Pedidos es una lista con los pedidos del archivo "verduleria_enanitos.csv" 
-        y pedido_a_eliminar es el id del pedido a eliminar
-Post: Devuelve una lista con los pedidos del archivo "verduleria_enanitos.csv" sin el pedido a eliminar
-"""
-def eliminar_pedido_indicado(pedidos, pedido_a_eliminar):
-    pedidos_actualizados = []
+# Pre: -
+# Post: Devuelve una lista con el elemento eliminado
+def eliminar_indicado(lista, elemento_a_eliminar):
+    lista_actualizad = []
 
-    for pedido in pedidos:
-        if len(pedido) > ID_PEDIDO:
-            if pedido[ID_PEDIDO] != pedido_a_eliminar:
-                pedidos_actualizados.append(pedido)
+    for elemento in lista:
+        if len(elemento) > ID_PEDIDO:
+            if elemento[ID_PEDIDO] != elemento_a_eliminar:
+                lista_actualizad.append(elemento)
 
-    return pedidos_actualizados
+    return lista_actualizad
 
-# Pre: Pedidos es una lista con los pedidos del archivo "verduleria_enanitos.csv"
-# Post: Reescribe el archivo "verduleria_enanitos.csv" con los pedidos de la lista pedidos
-def reescribir_archivo(pedidos):
-    with open(ARCHIVO_PEDIDOS, REENVIO_ARCHIVO, newline='') as archivo:
+# Pre: Lista es una lista de listas y archivo_a_reescribir es el archivo csv que queremos usar
+# Post: Reescribe el archivo "archivo_a_reescribir" con los elementos de la lista
+def reescribir_archivo(lista, archivo_a_reescribir):
+    with open(archivo_a_reescribir, REENVIO_ARCHIVO, newline='') as archivo:
         escritor_csv = csv.writer(archivo, delimiter=';')
-        escritor_csv.writerows(pedidos)
+        escritor_csv.writerows(lista)
 
 # Pre: -
 # Post: Devuelve si la eliminación es válida
-def eliminacion_valida():
-    return len(lista_argumentos) == 3 and lista_argumentos[2].isdigit()
+def eliminacion_valida(pedido_a_eliminar):
+    return len(lista_argumentos) == 3 and pedido_a_eliminar.isdigit()
+
+# Pre: pedidos es una lista de listas y pedido_a_eliminar es el pedido que queremos eliminar
+# Post: Devuelve si el pedido existe en la lista de pedidos
+def pedido_existe(pedidos, pedido_a_eliminar):
+    return any(pedido[ID_PEDIDO] == pedido_a_eliminar for pedido in pedidos)
+
+# Pre: pedidos es una lista de listas y pedido_a_eliminar es el pedido que queremos eliminar
+# Post: Elimina el pedido del archivo "verduleria_enanitos.csv"
+def eliminar_pedido(pedidos, pedido_a_eliminar):
+    pedidos_post_eliminacion = eliminar_indicado(pedidos, pedido_a_eliminar)
+    reescribir_archivo(pedidos_post_eliminacion, ARCHIVO_PEDIDOS)
+
+# Pre: clientes es una lista de listas y pedido_a_eliminar es el pedido que queremos eliminar
+# Post: Elimina el pedido del archivo "clientes.csv"
+def eliminar_cliente(clientes, pedido_a_eliminar):
+    clientes_post_eliminacion = eliminar_indicado(clientes, pedido_a_eliminar)
+    reescribir_archivo(clientes_post_eliminacion, ARCHIVO_CLIENTES)
 
 # Pre: -
 # Post: Elimina un pedido del archivo "verduleria_enanitos.csv"
-def eliminar_pedido():
-    if eliminacion_valida():
-        pedidos = leer_archivo()
-        pedidos_post_eliminacion = eliminar_pedido_indicado(pedidos, lista_argumentos[2])
-        reescribir_archivo(pedidos_post_eliminacion)
-        print(f"Pedido {lista_argumentos[2]} eliminado")
+def eliminar():
+    pedido_a_eliminar = lista_argumentos[2]
+    if eliminacion_valida(pedido_a_eliminar):
+        
+        pedidos = leer_archivo(ARCHIVO_PEDIDOS)
+        clientes = leer_archivo(ARCHIVO_CLIENTES)
+
+        if pedido_existe(pedidos, pedido_a_eliminar):
+            eliminar_pedido(pedidos, pedido_a_eliminar)
+            eliminar_cliente(clientes, pedido_a_eliminar)
+            print(f"Pedido {lista_argumentos[2]} eliminado")
+        else:
+            print(f"Error: El pedido {pedido_a_eliminar} no existe.")
     else:
         print("Comando no válido")
 
-# --- ELIMINAR PEDIDO ---
+""" --- ELIMINAR PEDIDO --- """
+
+""" --- MODIFICAR PEDIDO --- """
+
+def modificar_pedido():
+    pedidos = leer_archivo()
+
+    pedidos_a_modificar = []
+
+    for pedido in pedidos:
+        if pedido[ID_PEDIDO] == lista_argumentos[2]:
+            pedidos_a_modificar.append(pedido)
+        else:
+            print("El pedido no existe")
+            return
+
+    pass
+
+
+
+
+""" --- MODIFICAR PEDIDO --- """
+
 
 """
 Pre: -
@@ -237,12 +280,11 @@ def manejar_archivo():
     elif lista_argumentos[POSICION_COMANDO] == AGREGAR_PEDIDOS:
         agregar_pedido()
     elif lista_argumentos[POSICION_COMANDO] == ELIMINAR_PEDIDOS:
-        eliminar_pedido()
+        eliminar()
+    elif lista_argumentos[POSICION_COMANDO] == MODIFICAR_PEDIDOS:
+        modificar_pedido()
     else:
         print("Comando no válido")
-"""
-    elif lista_argumentos[POSICION_COMANDO] == MODIFICAR_PEDIDOS:
-        modificar()"""
 
 # Pre: -
 # Post: Chequea si el archivo "verduleria_enanitos.csv" existe, si no existe, lo crea
