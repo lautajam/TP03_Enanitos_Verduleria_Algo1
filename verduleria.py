@@ -149,25 +149,39 @@ def condicion_agregar_pedido():
     )
 
 # Pre: -
-# Post: Devuelve el último id del archivo "verduleria_enanitos.csv"
-def get_ultimo_id():
+# Post: Devuelve el nuevo id para el pedido, el id es el id mas grande + 1
+def get_nuevo_id():
     with open(ARCHIVO_PEDIDOS, LEER_ARCHIVO) as archivo:
-        pedidos = csv.reader(archivo)
-        return len(list(pedidos))
+
+        pedidos = list(csv.reader(archivo, delimiter=';'))
+
+        ultimo_id = 0
+
+        for pedido in pedidos:
+            if ultimo_id < int(pedido[ID_PEDIDO]):
+                ultimo_id = int(pedido[ID_PEDIDO])
+            pass
+
+        return ultimo_id + 1
 
 # Pre: -
 # Post: Agrega un pedido al archivo "verduleria_enanitos.csv"
 def agregar_pedido():
     if condicion_agregar_pedido():
 
-        id_pedido_actual = str(get_ultimo_id())
+        id_pedido_actual = str(get_nuevo_id())
 
         with open(ARCHIVO_PEDIDOS, ESCRIBIR_ARCHIVO) as archivo_pedidos:
-            pedido = f"{id_pedido_actual};{lista_argumentos[POSICION_VERDURA]};{lista_argumentos[POSICION_CANTIDAD]}\n"
+            verdura = lista_argumentos[POSICION_VERDURA].upper()
+            cantidad = lista_argumentos[POSICION_CANTIDAD]
+            
+            pedido = f"{id_pedido_actual};{verdura};{cantidad}\n"
             archivo_pedidos.write(pedido)
 
         with open(ARCHIVO_CLIENTES, ESCRIBIR_ARCHIVO) as archivo_clientes:
-            pedido_cliente = f"{id_pedido_actual};{lista_argumentos[POSICION_CLIENTE]}\n"
+            cliente = lista_argumentos[POSICION_CLIENTE]
+
+            pedido_cliente = f"{id_pedido_actual};{cliente}\n"
             archivo_clientes.write(pedido_cliente)
 
         print("Pedido agregado")
