@@ -56,13 +56,10 @@ def escribir_verdura(verdura):
 # Pre: pedido es un pedido en formato id;verdura;cantidad
 # Post: muestra por consola el pedido
 def escribir_pedido(pedido, nombre_cliente): #, nombre_cliente):
-    # Agregar el nombre de quien lo pide
-    print("-----------")
-    print("Pedido número:", pedido[ID_PEDIDO])
-    escribir_verdura(pedido[VERDURA].lower())
-    print("Cantidad:", pedido[CANTIDAD])
-    print("Cliente:", nombre_cliente)
-    print("-----------")
+    print(f"Pedido número: {pedido[ID_PEDIDO]}")
+    print(f"Producto: {pedido[VERDURA].capitalize()}")
+    print(f"Cantidad: {pedido[CANTIDAD]}")
+    print(f"Cliente: {nombre_cliente}")
 
 # Pre: numero_pedido es el id del pedido y lectura_clientes es el archivo "clientes.csv" leído
 # Post: devuelve el nombre del cliente que hizo el pedido, si no existe el pedido, devuelve un string vacío
@@ -97,7 +94,9 @@ def listar_pedido_especifico(numero_pedido):
     if nombre_cliente != "":
         for pedido in lectura_pedidos:
             if pedido and pedido[ID_PEDIDO] == numero_pedido:
+                print("-----------")
                 escribir_pedido(pedido, nombre_cliente)
+        print("-----------")
     else:
         print(f"No se encontró el pedido con el número {numero_pedido}")
 
@@ -121,14 +120,16 @@ def listar_todos_los_pedidos():
         print(f"Ocurrió un error al abrir el archivo de clientes: {e}")
         archivo_pedidos.close()
         return
-    
+
     lectura_clientes = list(csv.reader(archivo_clientes, delimiter=';'))
     lectura_pedidos = list(csv.reader(archivo_pedidos, delimiter=';'))
 
     if lectura_pedidos != [] and lectura_clientes != []:
         for pedido in lectura_pedidos:
+            print("-----------")
             nombre_cliente = obtener_nombre_cliente(pedido[ID_PEDIDO], lectura_clientes)
             escribir_pedido(pedido, nombre_cliente)
+        print("-----------")
     else:
         print("No hay pedidos")
 
