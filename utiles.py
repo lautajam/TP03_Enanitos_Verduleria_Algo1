@@ -1,0 +1,39 @@
+# Codigos de verduras
+TOMATE = "t"
+LECHUGA = "l"
+ZANAHORIA = "z"
+BROCOLI = "b"
+verduras = (TOMATE, LECHUGA, ZANAHORIA, BROCOLI)
+
+# Posiciones de los lista_argumentos
+POSICION_COMANDO = 1
+ID_PEDIDO = 0
+VERDURA = 1
+CANTIDAD = 2
+
+# Comandos
+LISTAR_PEDIDOS = "listar"
+AGREGAR_PEDIDOS = "agregar"
+ELIMINAR_PEDIDOS = "eliminar"
+MODIFICAR_PEDIDOS = "modificar"
+AYUDA = "ayuda"
+comandos_validos = (LISTAR_PEDIDOS, AGREGAR_PEDIDOS, ELIMINAR_PEDIDOS, MODIFICAR_PEDIDOS, AYUDA)
+
+# Agregar pedido
+CANTIDAD_ARGUMENTOS_AGREGAR = 5
+POSICION_CANTIDAD = 2
+POSICION_VERDURA = 3
+POSICION_CLIENTE = 4
+
+# Archivos
+ARCHIVO_PEDIDOS = "verduleria_enanitos.csv"
+ARCHIVO_CLIENTES = "clientes.csv"
+ARCHIVO_AUXILIAR_PEDIDOS = "auxiliarP.csv"
+ARCHIVO_AUXILIAR_CLIENTES = "auxiliarC.csv"
+
+# Modos de apertura de archivos
+ESCRIBIR_ARCHIVO = "a"
+REESCRIBIR_ARCHIVO = "w"
+LEER_ARCHIVO = "r"
+CREAR_ARCHIVO = "x"
+LEER_ESCRIBIR_ARCHIVO = "r+"

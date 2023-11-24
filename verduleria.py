@@ -1,44 +1,6 @@
 import sys, csv, os
-
-# Codigos de verduras
-TOMATE = "t"
-LECHUGA = "l"
-ZANAHORIA = "z"
-BROCOLI = "b"
-verduras = (TOMATE, LECHUGA, ZANAHORIA, BROCOLI)
-
-# Posiciones de los lista_argumentos
-POSICION_COMANDO = 1
-ID_PEDIDO = 0
-VERDURA = 1
-CANTIDAD = 2
-
-# Comandos
-LISTAR_PEDIDOS = "listar"
-AGREGAR_PEDIDOS = "agregar"
-ELIMINAR_PEDIDOS = "eliminar"
-MODIFICAR_PEDIDOS = "modificar"
-AYUDA = "ayuda"
-comandos_validos = (LISTAR_PEDIDOS, AGREGAR_PEDIDOS, ELIMINAR_PEDIDOS, MODIFICAR_PEDIDOS, AYUDA)
-
-# Agregar pedido
-CANTIDAD_ARGUMENTOS_AGREGAR = 5
-POSICION_CANTIDAD = 2
-POSICION_VERDURA = 3
-POSICION_CLIENTE = 4
-
-# Archivos
-ARCHIVO_PEDIDOS = "verduleria_enanitos.csv"
-ARCHIVO_CLIENTES = "clientes.csv"
-ARCHIVO_AUXILIAR_PEDIDOS = "auxiliarP.csv"
-ARCHIVO_AUXILIAR_CLIENTES = "auxiliarC.csv"
-
-# Modos de apertura de archivos
-ESCRIBIR_ARCHIVO = "a"
-REESCRIBIR_ARCHIVO = "w"
-LEER_ARCHIVO = "r"
-CREAR_ARCHIVO = "x"
-LEER_ESCRIBIR_ARCHIVO = "r+"
+from utiles import *
+from textos_ayuda import ayuda
 
 """ --- LISTADO DE PEDIDOS --- """
 # Pre: verdura es el código de la verdura
@@ -405,73 +367,6 @@ def modificar(argumentos):
         print("Ingreso no valido, escriba 'ayuda modificar' para mas información")
 """ --- MODIFICAR PEDIDO --- """
 
-""" --- AYUDA --- """
-# Pre: -
-# Post: Muestra por consola los comandos válidos
-def ayuda_basica():
-    print("Comandos válidos:")
-    print("     * listar, para listar todos los pedidos o un pedido específico")
-    print("     * agregar, para agregar un pedido")
-    print("     * eliminar, para eliminar un pedido")
-    print("     * modificar, para modificar un pedido")
-    print("     * ayuda, para mostrar los comandos válidos")
-    print("Si quieres mas información sobre un comando, escribe 'ayuda' seguido del comando")
-
-# Pre: -
-# Post: Muestra por consola los comandos válidos para listar
-def ayuda_listar():
-    print("Comando 'listar' válido:")
-    print("     * listar, para listar todos los pedidos o un pedido específico")
-    print("     * listar <id_pedido>, para listar un pedido específico")
-
-# Pre: -
-# Post: Muestra por consola los comandos válidos para agregar
-def ayuda_agregar():
-    print("Comando 'agregar' válido:")
-    print("     * agregar <cantidad> <verdura> <cliente>, para agregar un pedido")
-
-# Pre: -
-# Post: Muestra por consola los comandos válidos para eliminar
-def ayuda_eliminar():
-    print("Comando 'eliminar' válido:")
-    print("     * eliminar <id_pedido>, para eliminar un pedido")
-
-# Pre: -
-# Post: Muestra por consola los comandos válidos para modificar
-def ayuda_modificar():
-    print("Comando 'modificar' válido:")
-    print("     * modificar <id_pedido> <verdura> <cantidad>, para modificar un pedido")
-
-# Pre: -
-# Post: Muestra por consola los comandos válidos para ayuda
-def ayuda_ayuda():
-    print("Comando 'ayuda' válido_")
-    print("     * ayuda, para mostrar los comandos válidos")
-    print("     * ayuda <comando>, para mostrar información sobre un comando")
-
-# Pre: -
-# Post: Muestra por consola los comandos válidos
-def ayuda(argumentos):
-    if len(argumentos) == 2:
-        ayuda_basica()
-    elif len(argumentos) == 3:
-        comando = argumentos[2]
-        if comando == LISTAR_PEDIDOS:
-            ayuda_listar()
-        elif comando == AGREGAR_PEDIDOS:
-            ayuda_agregar()
-        elif comando == ELIMINAR_PEDIDOS:
-            ayuda_eliminar()
-        elif argumentos[2] == MODIFICAR_PEDIDOS:
-            ayuda_modificar()
-        elif comando == AYUDA:
-            ayuda_ayuda()
-        else:
-            print("Comando de ayuda no válido")
-    else:
-        print("Comando de ayuda no válido")
-""" --- AYUDA --- """
-
 """
 Pre: -
 Post: Dependiendo del comando ingresado por consola, se ejecuta la función correspondiente:
@@ -532,8 +427,3 @@ if __name__ == "__main__":
 
     if chequear_comando():
         manejar_archivo()
-
-
-
-
-        
