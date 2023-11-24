@@ -55,67 +55,98 @@ def escribir_verdura(verdura):
 
 # Pre: pedido es un pedido en formato id;verdura;cantidad
 # Post: muestra por consola el pedido
-def escribir_pedido(pedido):
+def escribir_pedido(pedido, nombre_cliente): #, nombre_cliente):
+    # Agregar el nombre de quien lo pide
     print("-----------")
     print("Pedido número:", pedido[ID_PEDIDO])
     escribir_verdura(pedido[VERDURA].lower())
     print("Cantidad:", pedido[CANTIDAD])
+    print("Cliente:", nombre_cliente)
     print("-----------")
+
+# Pre: numero_pedido es el id del pedido y lectura_clientes es el archivo "clientes.csv" leído
+# Post: devuelve el nombre del cliente que hizo el pedido, si no existe el pedido, devuelve un string vacío
+def obtener_nombre_cliente(numero_pedido, lectura_clientes):
+    for cliente in lectura_clientes:
+        if cliente and cliente[ID_PEDIDO] == numero_pedido:
+            return cliente[1]
+    return ""
 
 # Pre: el numero de pedido puede o no existir en el archivo "verduleria_enanitos.csv"
 # Post: si el pedido existe, lo lista, si no existe, muestra un mensaje de error
 def listar_pedido_especifico(numero_pedido):
-        
-        with open(ARCHIVO_PEDIDOS, LEER_ARCHIVO) as archivo:
 
-            pedidos_especificos = []
+    try:
+        archivo_pedidos = open(ARCHIVO_PEDIDOS, LEER_ARCHIVO)
+    except Exception as e:
+        print(f"Ocurrió un error al abrir el archivo de pedidos: {e}")
+        return
 
-            print("Listar pedido específico:")
-            for fila in csv.reader(archivo):
-                pedidos = fila[0].split(";")
+    try:
+        archivo_clientes = open(ARCHIVO_CLIENTES, LEER_ARCHIVO)
+    except Exception as e:
+        print(f"Ocurrió un error al abrir el archivo de clientes: {e}")
+        archivo_pedidos.close()
+        return
     
-                if pedidos[0] == numero_pedido:
-                    pedidos_especificos.append(pedidos)
-            
-            if len(pedidos_especificos) > 0:
-                for pedido in pedidos_especificos:
-                    escribir_pedido(pedido)
-                return
-                
-        print("El pedido no existe")
+    lectura_pedidos = csv.reader(archivo_pedidos, delimiter=';')
+    lectura_clientes = csv.reader(archivo_clientes, delimiter=';')
+
+    nombre_cliente = obtener_nombre_cliente(numero_pedido, lectura_clientes)
+
+    if nombre_cliente != "":
+        for pedido in lectura_pedidos:
+            if pedido and pedido[ID_PEDIDO] == numero_pedido:
+                escribir_pedido(pedido, nombre_cliente)
+    else:
+        print(f"No se encontró el pedido con el número {numero_pedido}")
+
+    archivo_pedidos.close()
+    archivo_clientes.close()
 
 # Pre: -
 # Post: Lista todos los pedidos del archivo "verduleria_enanitos.csv", en caso de que no haya pedidos, 
 #       muestra un mensaje de error
 def listar_todos_los_pedidos():
-    with open(ARCHIVO_PEDIDOS, LEER_ARCHIVO) as archivo:
-        
-        # Obtén el tamaño del archivo
-        tamano_archivo = os.path.getsize(ARCHIVO_PEDIDOS)
 
-        if tamano_archivo == 0:
-            print("No hay pedidos.")
-            return
+    try:
+        archivo_pedidos = open(ARCHIVO_PEDIDOS, LEER_ARCHIVO)
+    except Exception as e:
+        print(f"Ocurrió un error al abrir el archivo de pedidos: {e}")
+        return
 
-        print("Listar todos los pedidos:")
+    try:
+        archivo_clientes = open(ARCHIVO_CLIENTES, LEER_ARCHIVO)
+    except Exception as e:
+        print(f"Ocurrió un error al abrir el archivo de clientes: {e}")
+        archivo_pedidos.close()
+        return
+    
+    lectura_clientes = list(csv.reader(archivo_clientes, delimiter=';'))
+    lectura_pedidos = list(csv.reader(archivo_pedidos, delimiter=';'))
 
-        lectura_archivo = csv.reader(archivo)
+    if lectura_pedidos != [] and lectura_clientes != []:
+        for pedido in lectura_pedidos:
+            nombre_cliente = obtener_nombre_cliente(pedido[ID_PEDIDO], lectura_clientes)
+            escribir_pedido(pedido, nombre_cliente)
+    else:
+        print("No hay pedidos")
 
-        for fila in lectura_archivo:
-
-            pedido = fila[0].split(";")
-
-            escribir_pedido(pedido)
+    archivo_pedidos.close()
+    archivo_clientes.close()
 
 # Pre: -
 # Post: Lista todos los pedidos del archivo "verduleria_enanitos.csv", si 
 def listar_pedidos():
+
+    # Mejorar el manejo de errores
+
     if len(lista_argumentos) == 2:
         listar_todos_los_pedidos()
     elif len(lista_argumentos) == 3 and lista_argumentos[2].isdigit():
         listar_pedido_especifico(lista_argumentos[2])
     else:
-        print("Comando no válido")
+        print("Comando no válido, escriba 'ayuda listar' para mas información")
 """ --- LISTADO DE PEDIDOS --- """
 
 """ --- AGREGAR PEDIDO --- """
@@ -151,6 +182,11 @@ def condicion_agregar_pedido():
 # Pre: -
 # Post: Devuelve el nuevo id para el pedido, el id es el id mas grande + 1
 def get_nuevo_id():
+
+    # Acá tengo que modificar como se lee el pedido
+    # No lo tengo que poner en una lista, sino que lo tengo que manejar desde el archivo
+    # Agregar try except a la apertura del archivo
+
     with open(ARCHIVO_PEDIDOS, LEER_ARCHIVO) as archivo:
 
         pedidos = list(csv.reader(archivo, delimiter=';'))
@@ -167,6 +203,15 @@ def get_nuevo_id():
 # Pre: -
 # Post: Agrega un pedido al archivo "verduleria_enanitos.csv"
 def agregar_pedido():
+
+    # Acá tengo que modificar como se lee el pedido
+    # No lo tengo que poner en una lista, sino que lo tengo que manejar desde el archivo
+    # Escritura se maneja desde el archivo y un archivo auxiliar
+    # El archivo auxiliar se usa para pasar los datos del archivo original al archivo auxiliar
+    # Se elimina el archivo original y se renombra el archivo auxiliar
+    # Agregar try except a la apertura del archivo  
+    # Habría que hacer una inserción ordenada
+
     if condicion_agregar_pedido():
 
         id_pedido_actual = str(get_nuevo_id())
@@ -186,19 +231,25 @@ def agregar_pedido():
 
         print("Pedido agregado")
     else:
-        print("Comando no válido, reingrese")
+        print("Comando no válido, escriba 'ayuda agregar' para mas información")
 """ --- AGREGAR PEDIDO --- """
 
 """ --- ELIMINAR PEDIDO --- """
 # Pre: archivo_a_leer es el archivo csv
 # Post: Devuelve una lista con los elementos en el archivo pasado
 def leer_archivo(archivo_a_leer):
+
+    # Probablemente haya que eliminar esta función
+
     with open(archivo_a_leer, LEER_ARCHIVO, newline='') as archivo:
         return list(csv.reader(archivo, delimiter=';'))
 
 # Pre: -
 # Post: Devuelve una lista con el elemento eliminado
 def eliminar_indicado(lista, elemento_a_eliminar):
+
+    # Probablemente haya que eliminar esta función
+
     lista_actualizad = []
 
     for elemento in lista:
@@ -211,6 +262,9 @@ def eliminar_indicado(lista, elemento_a_eliminar):
 # Pre: Lista es una lista de listas y archivo_a_reescribir es el archivo csv que queremos usar
 # Post: Reescribe el archivo "archivo_a_reescribir" con los elementos de la lista
 def reescribir_archivo(lista, archivo_a_reescribir):
+
+    # Probablemente haya que eliminar esta función
+
     with open(archivo_a_reescribir, REESCRIBIR_ARCHIVO, newline='') as archivo:
         escritor_csv = csv.writer(archivo, delimiter=';')
         escritor_csv.writerows(lista)
@@ -228,18 +282,33 @@ def pedido_existe(pedidos, pedido_a_eliminar):
 # Pre: pedidos es una lista de listas y pedido_a_eliminar es el pedido que queremos eliminar
 # Post: Elimina el pedido del archivo "verduleria_enanitos.csv"
 def eliminar_pedido(pedidos, pedido_a_eliminar):
+
+    # Escritura se maneja desde el archivo y un archivo auxiliar
+    # El archivo auxiliar se usa para pasar los datos del archivo original al archivo auxiliar
+    # Se elimina el archivo original y se renombra el archivo auxiliar
+    # Agregar try except a la apertura del archivo
+
     pedidos_post_eliminacion = eliminar_indicado(pedidos, pedido_a_eliminar)
     reescribir_archivo(pedidos_post_eliminacion, ARCHIVO_PEDIDOS)
 
 # Pre: clientes es una lista de listas y pedido_a_eliminar es el pedido que queremos eliminar
 # Post: Elimina el pedido del archivo "clientes.csv"
 def eliminar_cliente(clientes, pedido_a_eliminar):
+
+    # Escritura se maneja desde el archivo y un archivo auxiliar
+    # El archivo auxiliar se usa para pasar los datos del archivo original al archivo auxiliar
+    # Se elimina el archivo original y se renombra el archivo auxiliar
+    # Agregar try except a la apertura del archivo
+
     clientes_post_eliminacion = eliminar_indicado(clientes, pedido_a_eliminar)
     reescribir_archivo(clientes_post_eliminacion, ARCHIVO_CLIENTES)
 
 # Pre: -
 # Post: Elimina un pedido del archivo "verduleria_enanitos.csv"
 def eliminar():
+
+    # Acá tengo que mejorar el manejo de errores
+
     pedido_a_eliminar = lista_argumentos[2]
     if eliminacion_valida(pedido_a_eliminar):
 
@@ -253,7 +322,7 @@ def eliminar():
         else:
             print(f"Error: El pedido {pedido_a_eliminar} no existe.")
     else:
-        print("Comando no válido")
+        print("Comando no válido, escriba 'ayuda eliminar' para mas información")
 """ --- ELIMINAR PEDIDO --- """
 
 """ --- MODIFICAR PEDIDO --- """
@@ -308,6 +377,13 @@ def validar_modificacion(id_pedido_a_modificar, verdura_pedido_a_modificar, cant
 # Pre: -
 # Post: Modifica un pedido del archivo "verduleria_enanitos.csv"
 def modificar():
+
+    # Escritura se maneja desde el archivo y un archivo auxiliar
+    # El archivo auxiliar se usa para pasar los datos del archivo original al archivo auxiliar
+    # Se elimina el archivo original y se renombra el archivo auxiliar
+    # Agregar try except a la apertura del archivo
+    # La modificacion deberia ser una inserción ordenada, en caso de que haya que agregar al mismo pedido
+
     if len(lista_argumentos) == 5:
         pedidos = leer_archivo(ARCHIVO_PEDIDOS)
 
@@ -325,10 +401,8 @@ def modificar():
                                                 cantidad_pedido_a_modificar)
             
             reescribir_archivo(pedidos_modificados, ARCHIVO_PEDIDOS)
-        else:
-            print("Ingreso no valido, debe ingresar <id_pedido> <verdura> <cantidad> (numero, letra, numero)")
     else:
-        print("Comando no válido")
+        print("Ingreso no valido, escriba 'ayuda modificar' para mas información")
 """ --- MODIFICAR PEDIDO --- """
 
 """ --- AYUDA --- """
@@ -409,6 +483,9 @@ Post: Dependiendo del comando ingresado por consola, se ejecuta la función corr
         En caso de que el comando no sea válido, muestra un mensaje de error
 """
 def manejar_archivo():
+
+    # Mejorar el manejo de errores
+
     if lista_argumentos[POSICION_COMANDO] == LISTAR_PEDIDOS:
         listar_pedidos()
     elif lista_argumentos[POSICION_COMANDO] == AGREGAR_PEDIDOS:
@@ -419,12 +496,13 @@ def manejar_archivo():
         modificar()
     elif lista_argumentos[POSICION_COMANDO] == AYUDA:
         ayuda()
-    else:
-        print("Comando no válido")
 
 # Pre: -
 # Post: Chequea si el archivo "verduleria_enanitos.csv" existe, si no existe, lo crea
 def chequear_archivo(archivo):
+
+    # Agregar try except a la creación del archivo
+
     if not os.path.exists(archivo):
         with open(archivo, CREAR_ARCHIVO):
             pass
@@ -432,8 +510,11 @@ def chequear_archivo(archivo):
 # Pre: -
 # Post: Chequea si el comando ingresado por consola es válido, si no es válido, muestra un mensaje de error
 def chequear_comando():
+
+    # Mejorar el manejo de errores
+
     if lista_argumentos[POSICION_COMANDO] not in comandos_validos:
-        print("Comando no válido")
+        print("Comando no válido, escriba 'ayuda' para mas información")
         return False
     return True
 
@@ -449,3 +530,8 @@ if __name__ == "__main__":
 
     if chequear_comando():
         manejar_archivo()
+
+
+
+
+        
