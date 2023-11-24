@@ -1,8 +1,66 @@
 import sys, csv, os
-from utiles import *
-from textos_ayuda import ayuda
 
-""" --- LISTADO DE PEDIDOS --- """
+# Codigos de verduras
+TOMATE = "t"
+LECHUGA = "l"
+ZANAHORIA = "z"
+BROCOLI = "b"
+verduras = (TOMATE, LECHUGA, ZANAHORIA, BROCOLI)
+
+# Posiciones de los lista_argumentos
+POSICION_COMANDO = 1
+ID_PEDIDO = 0
+VERDURA = 1
+CANTIDAD = 2
+
+# Comandos
+LISTAR_PEDIDOS = "listar"
+AGREGAR_PEDIDOS = "agregar"
+ELIMINAR_PEDIDOS = "eliminar"
+MODIFICAR_PEDIDOS = "modificar"
+AYUDA = "ayuda"
+comandos_validos = (LISTAR_PEDIDOS, AGREGAR_PEDIDOS, ELIMINAR_PEDIDOS, MODIFICAR_PEDIDOS, AYUDA)
+
+# Agregar pedido
+CANTIDAD_ARGUMENTOS_AGREGAR = 5
+POSICION_CANTIDAD = 2
+POSICION_VERDURA = 3
+POSICION_CLIENTE = 4
+
+# Archivos
+ARCHIVO_PEDIDOS = "verduleria_enanitos.csv"
+ARCHIVO_CLIENTES = "clientes.csv"
+ARCHIVO_AUXILIAR_PEDIDOS = "auxiliarP.csv"
+ARCHIVO_AUXILIAR_CLIENTES = "auxiliarC.csv"
+
+# Modos de apertura de archivos
+ESCRIBIR_ARCHIVO = "a"
+REESCRIBIR_ARCHIVO = "w"
+LEER_ARCHIVO = "r"
+CREAR_ARCHIVO = "x"
+LEER_ESCRIBIR_ARCHIVO = "r+"
+
+# Lisa de comandos válidos con una breve descripción
+diccionario_comandos_basico = {
+    LISTAR_PEDIDOS: "para listar un pedido específico",
+    AGREGAR_PEDIDOS: "para agregar un pedido",
+    ELIMINAR_PEDIDOS: "para eliminar un pedido",
+    MODIFICAR_PEDIDOS: "para modificar un pedido",
+    AYUDA: "para mostrar los comandos válidos"
+}
+
+# Lista de comandos válidos con una descripción detallada, con sus argumentos
+diccionario_comandos_completo = {
+    LISTAR_PEDIDOS: "<id_pedido>, para listar un pedido específico (id_pedido = numero, sin los '<' y '>')",
+    AGREGAR_PEDIDOS: "<cantidad> <verdura> <cliente>, para agregar un pedido (cantidad = numero, verdura = letra," +
+                        " cliente = nombre, sin los '<' y '>')",
+    ELIMINAR_PEDIDOS: "<id_pedido>, para eliminar un pedido (id_pedido = numero, sin los '<' y '>')",
+    MODIFICAR_PEDIDOS: "<id_pedido> <verdura> <cantidad>, para modificar un pedido (id_pedido = numero, verdura = letra," + 
+                        " cantidad = numero, sin los '<' y '>')",
+    AYUDA: "<comando>, para mostrar información sobre un comando (comando = cualquier comando válido, sin los '<' y '>')"
+}
+
+"""FIX --- LISTADO DE PEDIDOS --- FIX"""
 # Pre: verdura es el código de la verdura
 # Post: devuelve por consola el nombre de la verdura
 def escribir_verdura(verdura):
@@ -106,9 +164,9 @@ def listar_pedidos(argumentos):
         listar_pedido_especifico(argumentos[2])
     else:
         print(f"Comando con parámetros no válidos, escriba '{AYUDA} {LISTAR_PEDIDOS}' para mas información sobre los parámetros")
-""" --- LISTADO DE PEDIDOS --- """
+"""FIX --- LISTADO DE PEDIDOS --- FIX"""
 
-""" --- AGREGAR PEDIDO --- """
+"""FIX --- AGREGAR PEDIDO ---  FIX"""
 # Pre: verdura es el código de la verdura
 # Post: devuelve si la verdura es válida (si está en la lista de verduras)
 def verificar_verdura(verdura):
@@ -195,7 +253,7 @@ def agregar_pedido(argumentos):
 
     else:
         print(f"Comando con parámetros no válidos, escriba '{AYUDA} {AGREGAR_PEDIDOS}' para mas información sobre los parámetros")
-""" --- AGREGAR PEDIDO --- """
+"""FIX --- AGREGAR PEDIDO --- FIX"""
 
 """ --- ELIMINAR PEDIDO --- """
 # Pre: archivo_a_leer es el archivo csv
@@ -367,6 +425,71 @@ def modificar(argumentos):
         print("Ingreso no valido, escriba 'ayuda modificar' para mas información")
 """ --- MODIFICAR PEDIDO --- """
 
+"""FIX --- AYUDA --- FIX"""
+# Pre: -
+# Post: Muestra por consola los comandos válidos
+def ayuda_basica():
+    print( "Comandos válidos:")
+    for comando in comandos_validos:
+        print( "     *", comando + ", " + diccionario_comandos_basico[comando] + ".")
+    print(f"Si quieres mas información sobre un comando, o especificaciones de sus argumentos, escribe '{AYUDA}' <comando>.")
+
+# Pre: -
+# Post: Muestra por consola los comandos válidos para listar
+def ayuda_listar():
+    print(f"Comando '{LISTAR_PEDIDOS}' válido:")
+    print( "     *", LISTAR_PEDIDOS + ", " + diccionario_comandos_basico[LISTAR_PEDIDOS], "(sin argumentos).")
+    print( "     *", LISTAR_PEDIDOS, diccionario_comandos_completo[LISTAR_PEDIDOS] + ".")
+
+# Pre: -
+# Post: Muestra por consola los comandos válidos para agregar
+def ayuda_agregar():
+    print(f"Comando '{AGREGAR_PEDIDOS}' válido:")
+    print( "     *", AGREGAR_PEDIDOS, diccionario_comandos_completo[AGREGAR_PEDIDOS] + ".")
+
+# Pre: -
+# Post: Muestra por consola los comandos válidos para eliminar
+def ayuda_eliminar():
+    print(f"Comando '{ELIMINAR_PEDIDOS}' válido:")
+    print( "     *", ELIMINAR_PEDIDOS, diccionario_comandos_completo[ELIMINAR_PEDIDOS] + ".")
+
+# Pre: -
+# Post: Muestra por consola los comandos válidos para modificar
+def ayuda_modificar():
+    print(f"Comando '{MODIFICAR_PEDIDOS}' válido:")
+    print( "     *", MODIFICAR_PEDIDOS, diccionario_comandos_completo[MODIFICAR_PEDIDOS] + ".")
+
+# Pre: -
+# Post: Muestra por consola los comandos válidos para ayuda
+def ayuda_ayuda():
+    print(f"Comando '{AYUDA}' válido:")
+    print( "     *", AYUDA + ", " + diccionario_comandos_basico[AYUDA], "(sin argumentos).")
+    print( "     *", AYUDA, diccionario_comandos_completo[AYUDA] + ".")
+
+# Pre: -
+# Post: Muestra por consola los comandos válidos
+def ayuda(argumentos):
+    if len(argumentos) == 2:
+        ayuda_basica()
+        return
+    elif len(argumentos) == 3:
+        comando = argumentos[2]
+        if comando == LISTAR_PEDIDOS:
+            ayuda_listar()
+        elif comando == AGREGAR_PEDIDOS:
+            ayuda_agregar()
+        elif comando == ELIMINAR_PEDIDOS:
+            ayuda_eliminar()
+        elif argumentos[2] == MODIFICAR_PEDIDOS:
+            ayuda_modificar()
+        elif comando == AYUDA:
+            ayuda_ayuda()
+        else:
+            print(f"Comando con argumentos no válidos, escriba '{AYUDA} {AYUDA}' para mas información sobre los argumentos.")
+    else:
+        print(f"Comando con argumentos no válidos, escriba '{AYUDA} {AYUDA}' para mas información sobre los argumentos.")
+"""FIX --- AYUDA --- FIX"""
+
 """
 Pre: -
 Post: Dependiendo del comando ingresado por consola, se ejecuta la función correspondiente:
@@ -377,11 +500,7 @@ Post: Dependiendo del comando ingresado por consola, se ejecuta la función corr
         ayuda, para mostrar los comandos válidos
         En caso de que el comando no sea válido, muestra un mensaje de error
 """
-def manejar_archivo():
-
-    # Mejorar el manejo de errores
-
-    argumentos = sys.argv
+def manejar_archivo(argumentos):
 
     if argumentos[POSICION_COMANDO] == LISTAR_PEDIDOS:
         listar_pedidos(argumentos)
@@ -397,33 +516,40 @@ def manejar_archivo():
 # Pre: -
 # Post: Chequea si el archivo "verduleria_enanitos.csv" existe, si no existe, lo crea
 def chequear_archivo(archivo):
-
-    # Agregar try except a la creación del archivo
-
     if not os.path.exists(archivo):
-        with open(archivo, CREAR_ARCHIVO):
-            pass
+        try:
+            open(archivo, CREAR_ARCHIVO)
+        except Exception as e:
+            print(f"Ocurrió un error al crear el archivo {archivo}: {e}")
+            return False
+    return True
 
 # Pre: -
 # Post: Chequea si el comando ingresado por consola es válido, si no es válido, muestra un mensaje de error
-def chequear_comando():
-
-    # Mejorar el manejo de errores
-    argumentos = sys.argv
+def chequear_comando(argumentos = sys.argv):
     if argumentos[POSICION_COMANDO] not in comandos_validos:
-        print("Comando no válido, escriba 'ayuda' para mas información")
         return False
     return True
 
 # Pre: -
 # Post: Chequea si los archivos "verduleria_enanitos.csv" y "clientes.csv" existen, si no existen, los crea
 def chequear_archivos():
-    chequear_archivo(ARCHIVO_PEDIDOS)
-    chequear_archivo(ARCHIVO_CLIENTES)
+    archivo_pedidos_creado = chequear_archivo(ARCHIVO_PEDIDOS)
+    archivos_clientes_creado = chequear_archivo(ARCHIVO_CLIENTES) 
+    
+    if archivo_pedidos_creado and archivos_clientes_creado:
+        return True
+    return False
 
 if __name__ == "__main__":
-    
-    chequear_archivos()
 
-    if chequear_comando():
-        manejar_archivo()
+    if not chequear_archivos():
+        print("Ocurrio un error al crear los archivos, por favor, intente nuevamente.")
+        exit()
+
+    argumentos = sys.argv
+
+    if chequear_comando(argumentos):
+        manejar_archivo(argumentos)
+    else:
+        print(f"Comando no válido, escriba '{AYUDA}' para mas información.")
