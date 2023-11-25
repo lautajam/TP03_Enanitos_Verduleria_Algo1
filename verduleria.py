@@ -11,7 +11,7 @@ verduras = (TOMATE, LECHUGA, ZANAHORIA, BROCOLI)
 POSICION_COMANDO = 1
 ID_PEDIDO = 0
 VERDURA = 1
-CANTIDAD = 2
+CANTIDAD = 2 
 
 # Comandos
 LISTAR_PEDIDOS = "listar"
@@ -136,20 +136,15 @@ def listar_pedido_especifico(numero_pedido):
 def listar_todos_los_pedidos():
     try:
         archivo_pedidos = open(ARCHIVO_PEDIDOS, LEER_ARCHIVO)
+        lectura_pedidos = csv.reader(archivo_pedidos, delimiter=';')
     except Exception as e:
-        print(f"Ocurrió un error al abrir el archivo de pedidos: {e}")
-        return
-
+        print(f"Ocurrió un error al abrir el archivo de clientes: {e}.")
     try:
         archivo_clientes = open(ARCHIVO_CLIENTES, LEER_ARCHIVO)
+        lectura_clientes = list(csv.reader(archivo_clientes, delimiter=';'))
     except Exception as e:
-        print(f"Ocurrió un error al abrir el archivo de clientes: {e}")
-        archivo_pedidos.close()
-        return
+        print(f"Ocurrió un error al abrir el archivo de pedidos: {e}.")
 
-    lectura_clientes = csv.reader(archivo_clientes, delimiter=';')
-    lectura_pedidos = csv.reader(archivo_pedidos, delimiter=';')
-    
     if lectura_pedidos and lectura_clientes:
         for pedido in lectura_pedidos:
             if pedido and len(pedido) > ID_PEDIDO:
@@ -158,10 +153,10 @@ def listar_todos_los_pedidos():
                 escribir_pedido(pedido, nombre_cliente)
         print("-----------")
     else:
-        print("No hay pedidos")
+        print("No hay pedidos.")
 
-    archivo_pedidos.close()
     archivo_clientes.close()
+    archivo_pedidos.close()
 
 # Pre: -
 # Post: Lista todos los pedidos del archivo "verduleria_enanitos.csv", si 
