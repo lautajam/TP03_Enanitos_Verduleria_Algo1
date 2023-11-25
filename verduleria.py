@@ -1,5 +1,18 @@
 import sys, csv, os
 
+"""
+**********************************************************************************************************************
+* QUITAR TODOS LOS LITERALES DEL CÓDIGO, NO SEAS RE COGIDO Y HACELO, HIJO DE PUTA TE QUEDAN 3 DÍAS YA YA ESTÁ HECHO, *
+* APLAZÁ MASTURBARTE UN DÍA Y HACÉ ESTO, NO TE CUESTA NADA, NO SEAS FORRO.                                           *
+**********************************************************************************************************************
+"""
+
+
+
+
+INIT_INT = 0
+INCREMENTO_ID = 1
+
 # Codigos de verduras
 TOMATE = "t"
 LECHUGA = "l"
@@ -21,6 +34,12 @@ MODIFICAR_PEDIDOS = "modificar"
 AYUDA = "ayuda"
 comandos_validos = (LISTAR_PEDIDOS, AGREGAR_PEDIDOS, ELIMINAR_PEDIDOS, MODIFICAR_PEDIDOS, AYUDA)
 
+# Listar pedidos
+CANTIDAD_ARGUMENTOS_LISTAR_TODO = 2
+CANTIDAD_ARGUMENTOS_LISTAR_ESPECIFICO = 3
+POSICION_ID_NOMBRE_CLIENTE_LISTAR = 1
+POSICION_ID_LISTAR = 2
+
 # Agregar pedido
 CANTIDAD_ARGUMENTOS_AGREGAR = 5
 POSICION_CANTIDAD_AGREGAR = 2
@@ -28,12 +47,20 @@ POSICION_VERDURA_AGREGAR = 3
 POSICION_CLIENTE_AGREGAR = 4
 
 # Eliminar pedido
+CANTIDAD_ARGUMENTOS_ELIMINAR = 3
 POSICION_CLIENTE_ELIMINAR = 1
+POSICION_ID_ELIMINAR = 2
 
 # Modificar pedido
+CANTIDAD_ARGUMENTOS_MODIFICAR = 5
 POSICION_ID_MODIFICAR = 2
 POSICION_CANTIDAD_MODIFICAR = 3
 POSICION_VERDURA_MODIFICAR = 4
+
+# Ayuda
+CANTIDAD_ARGUMENTOS_AYUDA_BASICA = 2
+CANTIDAD_ARGUMENTOS_AYUDA_COMPLETO = 3
+COMANDO_PARA_AYUDA = 2
 
 # Archivos
 ARCHIVO_PEDIDOS = "verduleria_enanitos.csv"
@@ -94,7 +121,7 @@ def escribir_pedido(pedido, nombre_cliente): #, nombre_cliente):
 def obtener_nombre_cliente(numero_pedido, lectura_clientes):
     for cliente in lectura_clientes:
         if cliente and cliente[ID_PEDIDO] == numero_pedido:
-            return cliente[1]
+            return cliente[POSICION_ID_NOMBRE_CLIENTE_LISTAR]
     return ""
 
 # Pre: el numero de pedido puede o no existir en el archivo "verduleria_enanitos.csv"
@@ -161,10 +188,10 @@ def listar_todos_los_pedidos():
 # Pre: -
 # Post: Lista todos los pedidos del archivo "verduleria_enanitos.csv", si 
 def listar_pedidos(argumentos):
-    if len(argumentos) == 2:
+    if len(argumentos) == CANTIDAD_ARGUMENTOS_LISTAR_TODO:
         listar_todos_los_pedidos()
-    elif len(argumentos) == 3 and argumentos[2].isdigit():
-        listar_pedido_especifico(argumentos[2])
+    elif len(argumentos) == CANTIDAD_ARGUMENTOS_LISTAR_ESPECIFICO and argumentos[POSICION_ID_LISTAR].isdigit():
+        listar_pedido_especifico(argumentos[POSICION_ID_LISTAR])
     else:
         print(f"Comando con argumentos no válidos, escriba '{AYUDA} {LISTAR_PEDIDOS}' para mas información sobre los argumentos.")
 """FIXED --- LISTADO DE PEDIDOS --- FIXED"""
@@ -204,7 +231,7 @@ def condicion_agregar_pedido(argumentos):
 def get_ultimo_id(archivo):
     lectura_archivo = csv.reader(archivo, delimiter=';')
 
-    ultimo_id = 0
+    ultimo_id = INIT_INT
 
     for fila in lectura_archivo:
         if fila and len(fila) > ID_PEDIDO:
@@ -218,7 +245,7 @@ def get_nuevo_id(archivo_pedidos, archivo_clientes):
     ultimo_id_pedidos = get_ultimo_id(archivo_pedidos)
     ultimo_id_clientes = get_ultimo_id(archivo_clientes)
 
-    return max(ultimo_id_pedidos, ultimo_id_clientes) + 1
+    return max(ultimo_id_pedidos, ultimo_id_clientes) + INCREMENTO_ID
 
 # Pre: -
 # Post: Agrega un pedido al archivo "verduleria_enanitos.csv" (id, verdura, cantidad)
@@ -294,20 +321,62 @@ def eliminar_pedido(id_pedido_a_eliminar, archivo_original, archivo_auxiliar):
 # Pre: -
 # Post: Elimina un pedido de ambos archivos ()"verduleria_enanitos.csv" y "clientes.csv") y muestra un mensaje por consola
 def eliminar(argumentos):
-    if len(argumentos) == 3:
-        pedido_eliminado_pedidos = eliminar_pedido(argumentos[2], ARCHIVO_PEDIDOS, ARCHIVO_AUXILIAR_PEDIDOS)
-        pedido_eliminado_clientes = eliminar_pedido(argumentos[2], ARCHIVO_CLIENTES, ARCHIVO_AUXILIAR_CLIENTES)
+    if len(argumentos) == CANTIDAD_ARGUMENTOS_ELIMINAR:
+        pedido_eliminado_pedidos = eliminar_pedido(argumentos[POSICION_ID_ELIMINAR], ARCHIVO_PEDIDOS, ARCHIVO_AUXILIAR_PEDIDOS)
+        pedido_eliminado_clientes = eliminar_pedido(argumentos[POSICION_ID_ELIMINAR], ARCHIVO_CLIENTES, ARCHIVO_AUXILIAR_CLIENTES)
 
         if pedido_eliminado_pedidos and pedido_eliminado_clientes:
-            print(f"Pedido '{argumentos[2]}' eliminado.")
+            print(f"Pedido '{argumentos[POSICION_ID_ELIMINAR]}' eliminado.")
         else:
-            print(f"El pedido '{argumentos[2]}' no existe.")
+            print(f"El pedido '{argumentos[POSICION_ID_ELIMINAR]}' no existe.")
 
     else:
         print(f"Comando con argumentos no válidos, escriba '{AYUDA} {ELIMINAR_PEDIDOS}' para mas información sobre los argumentos.")
 """FIXED --- ELIMINAR PEDIDO --- FIXED"""
 
-"""FIXED --- MODIFICAR PEDIDO --- FIXED"""
+"""--- MODIFICAR PEDIDO ---"""
+
+"""" ARREGLAR
+Al modificar un pedido que ya existe, queriendo agregar una nueva verdura al pedido, lo que hace es lo inserta en el primero,
+si bien funciona, no verifica que el pedido con esa verdura ya exista, entonces duplica
+Ejemplo:
+
+Antes de modificar:
+
+2;Z;7
+2;B;2
+4;L;6
+4;T;15
+4;Z;10
+4;B;5
+5;T;7
+6;T;2
+7;B;5
+8;Z;3
+8;T;3
+10;Z;7
+
+python .\verduleria.py modificar 4 2 T
+
+Después de modificar:
+
+2;Z;7
+2;B;2
+4;T;2 <-- Se duplica el pedido
+4;L;6
+4;T;15 <-- Porque acá ya existe
+4;Z;10
+4;B;5
+5;T;7
+6;T;2
+7;B;5
+8;Z;3
+8;T;3
+10;Z;7
+
+Tengo que recorrer todos buscando hasta que se terminen, y si nunca lo encontró hay que agregarlo al final de los pedidos con el mismo id
+"""
+
 # Pre: el pedido es un pedido en formato id;verdura;cantidad
 # Post: Devuelve si el pedido es valido para modificar la cantidad
 def condicion_modificar_misma_verdura(argumentos, pedido):
@@ -333,7 +402,7 @@ def modificacion_ordenada(archivo_original, archivo_auxiliar, argumentos):
     escritura_archivo_auxiliar = csv.writer(archivo_auxiliar, delimiter=';')
 
     pedido_modificado = False
-    id_anterior = 0
+    id_anterior = INIT_INT
     for pedido in lectura_archivo_pedidos:
         if condicion_modificar_misma_verdura(argumentos, pedido) and not id_anterior == pedido[ID_PEDIDO]:
             nuevo_pedido = [pedido[ID_PEDIDO], argumentos[POSICION_VERDURA_MODIFICAR].upper(), argumentos[POSICION_CANTIDAD_MODIFICAR]]
@@ -355,7 +424,7 @@ def modificacion_ordenada(archivo_original, archivo_auxiliar, argumentos):
 # Post: Devuelve si los argumentos son válidos para modificar un pedido
 def condicion_modificar(argumentos):
     return (
-        len(argumentos) == 5 and
+        len(argumentos) == CANTIDAD_ARGUMENTOS_MODIFICAR and
         cantidad_valida(argumentos[POSICION_CANTIDAD_MODIFICAR]) and
         verdura_valida(argumentos[POSICION_VERDURA_MODIFICAR])
     )
@@ -444,11 +513,11 @@ def ayuda_ayuda():
 # Pre: -
 # Post: Muestra por consola los comandos válidos
 def ayuda(argumentos):
-    if len(argumentos) == 2:
+    if len(argumentos) == CANTIDAD_ARGUMENTOS_AYUDA_BASICA:
         ayuda_basica()
         return
-    elif len(argumentos) == 3:
-        comando = argumentos[2]
+    elif len(argumentos) == CANTIDAD_ARGUMENTOS_AYUDA_COMPLETO:
+        comando = argumentos[COMANDO_PARA_AYUDA]
         if comando == LISTAR_PEDIDOS:
             ayuda_listar()
         elif comando == AGREGAR_PEDIDOS:
