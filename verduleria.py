@@ -378,16 +378,18 @@ def modificacion(archivo_original, archivo_auxiliar, argumentos):
     lectura_archivo_pedidos = csv.reader(archivo_original, delimiter=';')
     escritura_archivo_auxiliar = csv.writer(archivo_auxiliar, delimiter=';')
 
-    pedido_modificado = False
     id_modificar = argumentos[POSICION_ID_MODIFICAR]
     verdura_modificar = argumentos[POSICION_VERDURA_MODIFICAR].upper()
     cantidad_modificar = argumentos[POSICION_CANTIDAD_MODIFICAR]
-    pedido_nuevo = [id_modificar, verdura_modificar, cantidad_modificar]
+    pedido_nuevo = [id_modificar, verdura_modificar, cantidad_modificar]    
 
+    pedido_modificado = False
+    id_existe = False
     pedido_anterior = []
+
     for pedido in lectura_archivo_pedidos:
-        print(pedido[ID_PEDIDO])
         if id_modificar == pedido[ID_PEDIDO]:
+            id_existe = True
             if pedido[VERDURA] == verdura_modificar.upper():
                 pedido[CANTIDAD] = cantidad_modificar
                 pedido_modificado = True
@@ -395,8 +397,12 @@ def modificacion(archivo_original, archivo_auxiliar, argumentos):
             if pedido_anterior and pedido_anterior[ID_PEDIDO] == id_modificar and not pedido_modificado:
                 escritura_archivo_auxiliar.writerow(pedido_nuevo)
                 pedido_modificado = True
+
         escritura_archivo_auxiliar.writerow(pedido)
         pedido_anterior = pedido
+
+    if not pedido_modificado and id_existe:
+        escritura_archivo_auxiliar.writerow(pedido_nuevo)
 
     return pedido_modificado
 
@@ -449,8 +455,6 @@ def modificar(argumentos):
             print(f"Comando con argumentos no válidos, escriba '{AYUDA} {MODIFICAR_PEDIDOS}' para mas información sobre los argumentos.")
     else:
         error_no_existe_archivo()
-
-
 """ --- MODIFICAR PEDIDO --- """
 
 """FIXED --- AYUDA --- FIXED"""
