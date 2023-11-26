@@ -77,11 +77,11 @@ diccionario_comandos_basico = {
 # Lista de comandos válidos con una descripción detallada, con sus argumentos
 diccionario_comandos_completo = {
     LISTAR_PEDIDOS: "<id_pedido>, para listar un pedido específico (id_pedido = numero, sin los '<' y '>')",
-    AGREGAR_PEDIDOS: "<cantidad> <verdura> <cliente>, para agregar un pedido (cantidad = numero, verdura = letra," +
+    AGREGAR_PEDIDOS: "<cantidad> <verdura> <cliente>, para agregar un pedido (cantidad = numero > 0, verdura = letra," +
                         " cliente = nombre, sin los '<' y '>')",
     ELIMINAR_PEDIDOS: "<id_pedido>, para eliminar un pedido (id_pedido = numero, sin los '<' y '>')",
     MODIFICAR_PEDIDOS: "<id_pedido> <verdura> <cantidad>, para modificar un pedido (id_pedido = numero, verdura = letra," + 
-                        " cantidad = numero, sin los '<' y '>')",
+                        " cantidad = numero > 0, sin los '<' y '>')",
     AYUDA: "<comando>, para mostrar información sobre un comando (comando = cualquier comando válido, sin los '<' y '>')"
 }
 
@@ -239,7 +239,7 @@ def longitud_argumentos_valida(argumentos):
 # Pre: -
 # Post: Devuelve si la cantidad es un número
 def cantidad_valida(cantidad):
-    return cantidad.isdigit()
+    return cantidad.isdigit() and int(cantidad) > INIT_INT
 
 # Pre: -
 # Post: Devuelve si la verdura es un string
