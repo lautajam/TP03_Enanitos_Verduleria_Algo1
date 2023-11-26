@@ -1,7 +1,8 @@
 import sys, csv, os
 
+""" --- CONSTANTES --- """
+# Constantes numericas
 INIT_INT = 0
-INCREMENTO_ID = 1
 
 # Codigos de verduras
 TOMATE = "t"
@@ -35,10 +36,10 @@ CANTIDAD_ARGUMENTOS_AGREGAR = 5
 POSICION_CANTIDAD_AGREGAR = 2
 POSICION_VERDURA_AGREGAR = 3
 POSICION_CLIENTE_AGREGAR = 4
+INCREMENTO_ID = 1
 
 # Eliminar pedido
 CANTIDAD_ARGUMENTOS_ELIMINAR = 3
-POSICION_CLIENTE_ELIMINAR = 1
 POSICION_ID_ELIMINAR = 2
 
 # Modificar pedido
@@ -64,7 +65,9 @@ REESCRIBIR_ARCHIVO = "w"
 LEER_ARCHIVO = "r"
 CREAR_ARCHIVO = "x"
 LEER_ESCRIBIR_ARCHIVO = "r+"
+""" --- CONSTANTES --- """
 
+""" --- DICCIONARIOS --- """
 # Lisa de comandos válidos con una breve descripción
 diccionario_comandos_basico = {
     LISTAR_PEDIDOS: "para listar un pedido específico",
@@ -77,15 +80,16 @@ diccionario_comandos_basico = {
 # Lista de comandos válidos con una descripción detallada, con sus argumentos
 diccionario_comandos_completo = {
     LISTAR_PEDIDOS: "<id_pedido>, para listar un pedido específico (id_pedido = numero, sin los '<' y '>')",
-    AGREGAR_PEDIDOS: "<cantidad> <verdura> <cliente>, para agregar un pedido (cantidad = numero > 0, verdura = letra," +
+    AGREGAR_PEDIDOS: f"<cantidad> <verdura> <cliente>, para agregar un pedido (cantidad = numero > 0, verdura = letra {verduras}," +
                         " cliente = nombre, sin los '<' y '>')",
     ELIMINAR_PEDIDOS: "<id_pedido>, para eliminar un pedido (id_pedido = numero, sin los '<' y '>')",
-    MODIFICAR_PEDIDOS: "<id_pedido> <verdura> <cantidad>, para modificar un pedido (id_pedido = numero, verdura = letra," + 
+    MODIFICAR_PEDIDOS: f"<id_pedido> <verdura> <cantidad>, para modificar un pedido (id_pedido = numero, verdura = letra {verduras}," + 
                         " cantidad = numero > 0, sin los '<' y '>')",
     AYUDA: "<comando>, para mostrar información sobre un comando (comando = cualquier comando válido, sin los '<' y '>')"
 }
+""" --- DICCIONARIOS --- """
 
-"""FIXED --- LISTADO DE PEDIDOS --- FIXED"""
+""" --- LISTADO DE PEDIDOS --- """
 # Pre: -
 # Post: Muestra un mensaje de error por consola
 def error_no_existe_archivo():
@@ -202,9 +206,9 @@ def listar_pedidos(argumentos):
             print(f"Comando con argumentos no válidos, escriba '{AYUDA} {LISTAR_PEDIDOS}' para mas información sobre los argumentos.")
     else:
         error_no_existe_archivo()
-"""FIXED --- LISTADO DE PEDIDOS --- FIXED"""
+"""--- LISTADO DE PEDIDOS ---"""
 
-"""FIXED --- AGREGAR PEDIDO ---  FIXED"""
+"""--- AGREGAR PEDIDO ---"""
 # Pre: -
 # Post: Chequea si el archivo pasado existe, si no existe, lo crea
 def chequear_archivo(archivo):
@@ -312,9 +316,9 @@ def agregar_pedido(argumentos):
             print(f"Comando con argumentos no válidos, escriba '{AYUDA} {AGREGAR_PEDIDOS}' para mas información sobre los argumentos")
     else:
         print("Ocurrió un error al abrir los archivos. Intente nuevamente.")
-"""FIXED --- AGREGAR PEDIDO --- FIXED"""
+""" --- AGREGAR PEDIDO --- """
 
-"""FIXED --- ELIMINAR PEDIDO --- FIXED"""
+""" --- ELIMINAR PEDIDO --- """
 # Pre: El archivo "archivo_original"
 # Post: Devuelve si el pedido fue eliminado, además, elimina el pedido del archivo "archivo_original" 
 def eliminar_pedido(id_pedido_a_eliminar, archivo_original, archivo_auxiliar):
@@ -364,12 +368,9 @@ def eliminar(argumentos):
             print(f"Comando con argumentos no válidos, escriba '{AYUDA} {ELIMINAR_PEDIDOS}' para mas información sobre los argumentos.")
     else:
         error_no_existe_archivo()
-"""FIXED --- ELIMINAR PEDIDO --- FIXED"""
+""" --- ELIMINAR PEDIDO --- """
 
 """--- MODIFICAR PEDIDO ---"""
-"""" ARREGLAR
-NO SE INSERTA EL ELEMENTO DE FORMA ORDENADA, SE INSERTA ULTIMO, HAY QUE PONERLO EN SU LUGAR
-"""
 
 # Pre: el archivo_original está abierto en modo lectura y el archivo_auxiliar está abierto en modo escritura
 # Post: Modifica un pedido del archivo archivo_original (id, cantidad, verdura) y lo escribe en el archivo_auxiliar,
@@ -455,9 +456,9 @@ def modificar(argumentos):
             print(f"Comando con argumentos no válidos, escriba '{AYUDA} {MODIFICAR_PEDIDOS}' para mas información sobre los argumentos.")
     else:
         error_no_existe_archivo()
-""" --- MODIFICAR PEDIDO --- """
+"""--- MODIFICAR PEDIDO ---"""
 
-"""FIXED --- AYUDA --- FIXED"""
+""" --- AYUDA --- """
 # Pre: -
 # Post: Muestra por consola los comandos válidos
 def ayuda_basica():
@@ -520,7 +521,7 @@ def ayuda(argumentos):
             print(f"Comando con argumentos no válidos, escriba '{AYUDA} {AYUDA}' para mas información sobre los argumentos.")
     else:
         print(f"Comando con argumentos no válidos, escriba '{AYUDA} {AYUDA}' para mas información sobre los argumentos.")
-"""FIXED --- AYUDA --- FIXED"""
+""" --- AYUDA --- """
 
 """
 Pre: -
