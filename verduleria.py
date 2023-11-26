@@ -86,7 +86,6 @@ diccionario_comandos_completo = {
 }
 
 """FIXED --- LISTADO DE PEDIDOS --- FIXED"""
-
 # Pre: -
 # Post: Muestra un mensaje de error por consola
 def error_no_existe_archivo():
@@ -383,20 +382,23 @@ def modificacion(archivo_original, archivo_auxiliar, argumentos):
     id_modificar = argumentos[POSICION_ID_MODIFICAR]
     verdura_modificar = argumentos[POSICION_VERDURA_MODIFICAR].upper()
     cantidad_modificar = argumentos[POSICION_CANTIDAD_MODIFICAR]
+    pedido_nuevo = [id_modificar, verdura_modificar, cantidad_modificar]
 
+    pedido_anterior = []
     for pedido in lectura_archivo_pedidos:
+        print(pedido[ID_PEDIDO])
         if id_modificar == pedido[ID_PEDIDO]:
             if pedido[VERDURA] == verdura_modificar.upper():
                 pedido[CANTIDAD] = cantidad_modificar
                 pedido_modificado = True
-            escritura_archivo_auxiliar.writerow(pedido)
         else:
-            escritura_archivo_auxiliar.writerow(pedido)
+            if pedido_anterior and pedido_anterior[ID_PEDIDO] == id_modificar and not pedido_modificado:
+                escritura_archivo_auxiliar.writerow(pedido_nuevo)
+                pedido_modificado = True
+        escritura_archivo_auxiliar.writerow(pedido)
+        pedido_anterior = pedido
 
-    if not pedido_modificado:
-        nuevo_pedido = [id_modificar, verdura_modificar, cantidad_modificar]
-
-    return pedido_modificado, nuevo_pedido
+    return pedido_modificado
 
 # Pre: -
 # Post: Devuelve si los argumentos son válidos para modificar un pedido
@@ -427,7 +429,7 @@ def modificar_pedidos(argumentos):
     archivo_pedidos.close()
     archivo_auxiliar.close()
 
-    os.remove(ARCHIVO_AUXILIAR_PEDIDOS)
+    os.remove(ARCHIVO_PEDIDOS)
     os.rename(ARCHIVO_AUXILIAR_PEDIDOS, ARCHIVO_PEDIDOS)
 
     return pedido_modificado
